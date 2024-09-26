@@ -15,7 +15,10 @@ vector_extension
 |   |-- vector.c                    # defination of related function
 |   |-- vector_extension--1.0.sql   # register data type and function into postgres
 |   |-- vector_extension.control    # description file for extension installation
-|   |-- Makefile              
+|   |-- Makefile  
+|-- docs
+|   |-- type_design.md              # detailed information about data type
+|   |-- function_design.md          # detailed information about function
 |-- README.md      
 ```
 
