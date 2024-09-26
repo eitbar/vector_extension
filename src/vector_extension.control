@@ -1,0 +1,4 @@
+comment = 'A vector data'
+default_version = '1.0'
+relocatable = true
+module_pathname = '$libdir/vector_extension'
