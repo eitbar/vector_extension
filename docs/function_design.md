@@ -32,11 +32,13 @@ The expected result is:
 
 ### K nearest neighbors search
 
-Source code position: `PG_FUNCTION_INFO_V1(vector_nearest_neighbor);` in `src/vector.c`.
+Source code position: `PG_FUNCTION_INFO_V1(vector_k_nearest_neighbor);` in `src/vector.c`.
 
 It take four input parameters, including `vector` with data type Vector, `table_name` with data type text, `column_name` with data type text and `k` with data type int.
 
 It will search the `k` nearest neighbors with `l2 distance` on `table_name.column_name`. 
+
+The implementation is very basic based on `Order By` SQL function, that is, traverse all vector data, sort them according to the l2 distance, and finally get the top k results.
 
 The results will be shown as a table with two column `id` and `vector`, which represent the original id and vector in the original table.
 
