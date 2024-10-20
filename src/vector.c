@@ -131,7 +131,7 @@ vector_out(PG_FUNCTION_ARGS)
     appendStringInfoChar(&buf, '[');
     for (int i = 0; i < vector->dim; i++) {
         if (i > 0) appendStringInfoChar(&buf, ',');
-        appendStringInfo(&buf, "%f", vector->x[i]);
+        appendStringInfo(&buf, "%5f", vector->x[i]);
     }
     appendStringInfoChar(&buf, ']');
 
@@ -345,6 +345,63 @@ vector_div_number(PG_FUNCTION_ARGS)
     }
 
     PG_RETURN_POINTER(result);
+}
+
+
+// dim
+
+PG_FUNCTION_INFO_V1(dim);
+Datum
+dim(PG_FUNCTION_ARGS)
+{
+    Vector *vec = (Vector *) PG_GETARG_VECTOR_P(0);
+    PG_RETURN_INT32(vec->dim);
+}
+
+PG_FUNCTION_INFO_V1(norm);
+Datum
+norm(PG_FUNCTION_ARGS)
+{
+    Vector *vec = (Vector *) PG_GETARG_VECTOR_P(0);
+    float sum = 0.0;
+
+    for (int i = 0; i < vec->dim; i++) {
+        sum += vec->x[i] * vec->x[i];
+    }
+    PG_RETURN_FLOAT4(sqrt(sum));
+}
+
+
+PG_FUNCTION_INFO_V1(cos_distance);
+Datum
+cos_distance(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    Vector *v2 = (Vector *) PG_GETARG_VECTOR_P(1);
+    float result = 0.0;
+    float sum1 = 0.0;
+    float sum2 = 0.0;
+    int dim;
+
+    if (v1->dim != v2->dim)
+        ereport(ERROR, (errmsg("Cannot add vectors of different dimensions")));
+
+    dim = v1->dim;
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result += v1->x[i] * v2->x[i];
+        sum1 += v1->x[i] * v1->x[i];
+        sum2 += v2->x[i] * v2->x[i];
+    }
+
+    if (sum1 == 0 || sum2 == 0) {
+        ereport(ERROR, (errmsg("Cannot calculate cosine distance for zero vector")));
+    }
+
+    result = result / sqrt(sum1) / sqrt(sum2);
+
+    PG_RETURN_FLOAT4(result);
 }
 
 

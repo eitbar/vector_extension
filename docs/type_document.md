@@ -96,7 +96,7 @@ SELECT '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector / 5;
 ```
 
 
-### Vector Operators (ongoing)
+### Vector Operators
 
 Dimension Operator: `dim`
 
@@ -106,15 +106,15 @@ usage:
 SELECT id, dim(vec) from vectors;
 ```
 
-Norm Operator: `norm2`
+Norm Operator: `norm`
 
 usage:
 
 ```
-SELECT id, vec, norm2(vec) from vectors;
+SELECT id, vec, norm(vec) from vectors;
 ```
 
-### Distance Operators (ongoing)
+### Distance Operators
 
 L2distance Operator: `<->`
 
@@ -126,14 +126,20 @@ SELECT '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector <-> '[1.0, 2.0, 3.0, 4.0, 5.0]'::vec
 SELECT id, vec FROM vectors ORDER BY vec <-> '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector LIMIT 3;
 ```
 
-Cosin Distance Operator: `<-c->` 
+Cosin Distance Operator: `<#>` 
 
 usage:
 
 ```
-SELECT '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector <-c-> '[1.0, 2.0, 3.0, 4.0, 5.0]'::vector;
+SELECT '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector <#> '[1.0, 2.0, 3.0, 4.0, 5.0]'::vector;
 
-SELECT id, vec FROM vectors ORDER BY vec <-c-> '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector LIMIT 3;
+SELECT id, vec FROM vectors ORDER BY vec <#> '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector DESC LIMIT 3;
+```
+
+we can also implement the cosin distance by the basic operators:
+
+```
+SELECT id, vec FROM vectors ORDER BY vec * '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector / norm(vec) / norm('[6.0, 7.0, 8.0, 9.0, 10.0]'::vector) DESC LIMIT 3;
 ```
 
 ## Index Support

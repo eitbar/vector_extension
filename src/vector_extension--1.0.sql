@@ -137,9 +137,22 @@ CREATE OPERATOR / (
 );
 
 
+CREATE FUNCTION dim(vector) RETURNS int 
+AS 'vector_extension', 'dim' 
+LANGUAGE C STRICT;
+
+CREATE FUNCTION norm(vector) RETURNS float4 
+AS 'vector_extension', 'norm' 
+LANGUAGE C STRICT;
+
+
 
 CREATE FUNCTION l2_distance(vector, vector) RETURNS float4 
 AS 'vector_extension', 'vector_l2_distance' 
+LANGUAGE C STRICT;
+
+CREATE FUNCTION cos_distance(vector, vector) RETURNS float4 
+AS 'vector_extension', 'cos_distance' 
 LANGUAGE C STRICT;
 
 CREATE OPERATOR <-> (
@@ -147,4 +160,11 @@ CREATE OPERATOR <-> (
     RIGHTARG = vector,
     PROCEDURE = l2_distance,
     COMMUTATOR = '<->'
+);
+
+CREATE OPERATOR <#> (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    PROCEDURE = cos_distance,
+    COMMUTATOR = '<#>'
 );
