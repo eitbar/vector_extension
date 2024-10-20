@@ -139,6 +139,215 @@ vector_out(PG_FUNCTION_ARGS)
 }
 
 
+PG_FUNCTION_INFO_V1(vector_typmod_in);
+Datum
+vector_typmod_in(PG_FUNCTION_ARGS)
+{
+	ArrayType  *ta = PG_GETARG_ARRAYTYPE_P(0);
+	int32	   *tl;
+	int			n;
+
+	tl = ArrayGetIntegerTypmods(ta, &n);
+    PG_RETURN_INT32(*tl);
+}
+
+
+// basic operator
+
+// =
+PG_FUNCTION_INFO_V1(vector_eq);
+Datum
+vector_eq(PG_FUNCTION_ARGS)
+{
+
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    Vector *v2 = (Vector *) PG_GETARG_VECTOR_P(1);
+
+    if (v1->dim != v2->dim)
+        PG_RETURN_BOOL(false);
+
+    for (int i = 0; i < v1->dim; i++) {
+        if (v1->x[i] != v2->x[i])
+            PG_RETURN_BOOL(false);
+    }
+
+    PG_RETURN_BOOL(true);
+}
+
+// !=
+PG_FUNCTION_INFO_V1(vector_ne);
+Datum
+vector_ne(PG_FUNCTION_ARGS)
+{
+
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    Vector *v2 = (Vector *) PG_GETARG_VECTOR_P(1);
+
+    if (v1->dim != v2->dim)
+        PG_RETURN_BOOL(true);
+
+    for (int i = 0; i < v1->dim; i++) {
+        if (v1->x[i] != v2->x[i])
+            PG_RETURN_BOOL(true);
+    }
+
+    PG_RETURN_BOOL(false);
+}
+
+// Calculation Operators
+PG_FUNCTION_INFO_V1(vector_add_vector);
+Datum
+vector_add_vector(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    Vector *v2 = (Vector *) PG_GETARG_VECTOR_P(1);
+    Vector *result;
+    int dim;
+
+    if (v1->dim != v2->dim)
+        ereport(ERROR, (errmsg("Cannot add vectors of different dimensions")));
+
+    dim = v1->dim;
+
+    result = InitVector(dim);
+
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result->x[i] = v1->x[i] + v2->x[i];
+    }
+
+    PG_RETURN_POINTER(result);
+}
+
+PG_FUNCTION_INFO_V1(vector_add_number);
+Datum
+vector_add_number(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    float number = PG_GETARG_FLOAT4(1);
+    Vector *result;
+    int dim = v1->dim;
+
+    result = InitVector(dim);
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result->x[i] = v1->x[i] + number;
+    }
+    PG_RETURN_POINTER(result);
+}
+
+PG_FUNCTION_INFO_V1(vector_sub_vector);
+Datum
+vector_sub_vector(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    Vector *v2 = (Vector *) PG_GETARG_VECTOR_P(1);
+    Vector *result;
+    int dim;
+
+    if (v1->dim != v2->dim)
+        ereport(ERROR, (errmsg("Cannot add vectors of different dimensions")));
+
+    dim = v1->dim;
+
+    result = InitVector(dim);
+
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result->x[i] = v1->x[i] - v2->x[i];
+    }
+
+    PG_RETURN_POINTER(result);
+}
+
+PG_FUNCTION_INFO_V1(vector_sub_number);
+Datum
+vector_sub_number(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    float number = PG_GETARG_FLOAT4(1);
+    Vector *result;
+    int dim = v1->dim;
+
+    result = InitVector(dim);
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result->x[i] = v1->x[i] - number;
+    }
+    PG_RETURN_POINTER(result);
+}
+
+PG_FUNCTION_INFO_V1(vector_dotproduct_vector);
+Datum
+vector_dotproduct_vector(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    Vector *v2 = (Vector *) PG_GETARG_VECTOR_P(1);
+    float result = 0.0;
+    int dim;
+
+    if (v1->dim != v2->dim)
+        ereport(ERROR, (errmsg("Cannot add vectors of different dimensions")));
+
+    dim = v1->dim;
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result += v1->x[i] * v2->x[i];
+    }
+
+    PG_RETURN_FLOAT4(result);
+}
+
+PG_FUNCTION_INFO_V1(vector_dot_number);
+Datum
+vector_dot_number(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    float number = PG_GETARG_FLOAT4(1);
+    Vector *result;
+    int dim = v1->dim;
+
+    result = InitVector(dim);
+
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result->x[i] = v1->x[i] * number;
+    }
+
+    PG_RETURN_POINTER(result);
+}
+
+
+PG_FUNCTION_INFO_V1(vector_div_number);
+Datum
+vector_div_number(PG_FUNCTION_ARGS)
+{
+    Vector *v1 = (Vector *) PG_GETARG_VECTOR_P(0);
+    float number = PG_GETARG_FLOAT4(1);
+    Vector *result;
+    int dim = v1->dim;
+    
+    if (number == 0)
+        ereport(ERROR, (errmsg("Cannot divide 0")));
+
+    result = InitVector(dim);
+
+    // Perform element-wise addition
+    for (int i = 0; i < dim; i++)
+    {
+        result->x[i] = v1->x[i] / number;
+    }
+
+    PG_RETURN_POINTER(result);
+}
+
+
 PG_FUNCTION_INFO_V1(vector_l2_distance);
 Datum
 vector_l2_distance(PG_FUNCTION_ARGS)
@@ -156,20 +365,6 @@ vector_l2_distance(PG_FUNCTION_ARGS)
     }
     PG_RETURN_FLOAT4(sqrt(sum));
 }
-
-
-PG_FUNCTION_INFO_V1(vector_typmod_in);
-Datum
-vector_typmod_in(PG_FUNCTION_ARGS)
-{
-	ArrayType  *ta = PG_GETARG_ARRAYTYPE_P(0);
-	int32	   *tl;
-	int			n;
-
-	tl = ArrayGetIntegerTypmods(ta, &n);
-    PG_RETURN_INT32(*tl);
-}
-
 
 
 PG_FUNCTION_INFO_V1(vector_nearest_neighbor);

@@ -41,7 +41,7 @@ SELECT '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector;
 
 ## Basic Operator
 
-### Comparison Operators (ongoing)
+### Comparison Operators
 
 Equal Operator: `=`
 
@@ -51,15 +51,15 @@ usage:
 SELECT * FROM vectors WHERE vec = '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector;
 ```
 
-Not Equal Operator: `!=`
+Not Equal Operator: `<>`
 
 usage:
 
 ```
-SELECT * FROM vectors WHERE vec != '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector;
+SELECT * FROM vectors WHERE vec <> '[6.0, 7.0, 8.0, 9.0, 10.0]'::vector;
 ```
 
-### Calculation Operators (onging)
+### Calculation Operators
 
 Add Operator: `+`
 
